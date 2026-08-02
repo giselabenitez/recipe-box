@@ -15,3 +15,5 @@ export interface Recipe {
     updatedAt: string;
     syncStatus: "synced" | "pending" | "error";
 }
+
+export type NewRecipeInput = Omit<Recipe, "id" | "createdAt" | "updatedAt" | "syncStatus">;

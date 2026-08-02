@@ -1,35 +1,38 @@
 import { useEffect } from "react";
-import { saveRecipe, getAllRecipes } from "./storage/recipesDb";
-import type { Recipe } from "./types/recipe";
+import { useRecipesStore } from "./store/recipesStore";
 
 function App() {
+  const recipes = useRecipesStore((state) => state.recipes);
+  const status = useRecipesStore((state) => state.status);
+  const loadRecipes = useRecipesStore((state) => state.loadRecipes);
+  const addRecipe = useRecipesStore((state) => state.addRecipe);
+
   useEffect(() => {
-    async function testStorage() {
-      const sample: Recipe = {
-        id: crypto.randomUUID(),
-        title: "Tortilla de patatas",
-        description: "Classic Spanish potato omelette",
-        ingredients: [
-          { id: crypto.randomUUID(), name: "Potatoes", quantity: "4 medium" },
-          { id: crypto.randomUUID(), name: "Eggs", quantity: "6" },
-        ],
-        steps: ["Slice and fry the potatoes", "Beat the eggs", "Combine and cook"],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        syncStatus: "pending",
-      };
+    loadRecipes();
+  }, [loadRecipes]);
 
-      await saveRecipe(sample);
-      const all = await getAllRecipes();
-      console.log("Recipes in IndexedDB:", all);
-    }
-
-    testStorage();
-  }, []);
+  function addSampleRecipe() {
+    addRecipe({
+      title: "Tortilla de patatas",
+      description: "Classic Spanish potato omelette",
+      ingredients: [
+        { id: crypto.randomUUID(), name: "Potatoes", quantity: "4 medium" },
+        { id: crypto.randomUUID(), name: "Eggs", quantity: "6" },
+      ],
+      steps: ["Slice and fry the potatoes", "Beat the eggs", "Combine and cook"],
+    });
+  }
 
   return (
     <div>
       <h1>Recipe Box</h1>
+      <p>Status: {status}</p>
+      <button onClick={addSampleRecipe}>Add sample recipe</button>
+      <ul>
+        {recipes.map((recipe) => (
+          <li key={recipe.id}>{recipe.title}</li>
+        ))}
+      </ul>
     </div>
   );
 }
